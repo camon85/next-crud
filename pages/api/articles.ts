@@ -27,4 +27,5 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     default:
       res.status(405).end(`Method ${method} Not Allowed`);
   }
+  console.log(articles);
 };

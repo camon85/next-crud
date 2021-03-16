@@ -1,20 +1,20 @@
 import Head from "next/head";
 import Link from "next/link";
-import Router from "next/router";
 import { Container, Row, Card, Button } from "react-bootstrap";
 import Form from "react-bootstrap/Form";
 import fetch from "isomorphic-unfetch";
 import React, { useState } from "react";
+import Router from "next/router";
 
-export default function Create() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+export default function Edit({ article }) {
+  const [title, setTitle] = useState(article.title);
+  const [content, setContent] = useState(article.content);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const res = await fetch("http://localhost:8080/article", {
-      method: "POST",
+    const res = await fetch(`http://localhost:8080/article/${article.id}`, {
+      method: "PUT",
       body: JSON.stringify({
         title,
         content,
@@ -34,10 +34,10 @@ export default function Create() {
   return (
     <Container className="md-container">
       <Head>
-        <title>create</title>
+        <title>{article.id}</title>
       </Head>
       <Container>
-        <h1>create</h1>
+        <h1>edit</h1>
         <Link href={"/list"}>
           <Button variant="primary">list</Button>
         </Link>
@@ -54,6 +54,7 @@ export default function Create() {
                         type="text"
                         placeholder="Enter Title"
                         onChange={(e) => setTitle(e.target.value)}
+                        value={title}
                       />
                     </Form.Group>
                   </Card.Title>
@@ -64,6 +65,7 @@ export default function Create() {
                         type="text"
                         placeholder="Enter Content"
                         onChange={(e) => setContent(e.target.value)}
+                        value={content}
                       />
                     </Form.Group>
                   </Card.Text>
@@ -89,4 +91,17 @@ export default function Create() {
       </footer>
     </Container>
   );
+}
+
+export async function getServerSideProps({ query }) {
+  const id = query.id;
+  try {
+    const res = await fetch(`http://localhost:8080/article/${id}`);
+    const article = await res.json();
+    return {
+      props: { article },
+    };
+  } catch (err) {
+    console.error(err);
+  }
 }
